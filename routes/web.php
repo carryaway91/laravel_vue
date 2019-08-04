@@ -12,8 +12,11 @@
 */
 
 Route::get('/', 'PostsController@index')->name('home');
+
+Route::get('posts/{slug}/comments', 'PostsController@fetch');
 Route::resource('posts', 'PostsController');
-Route::resource('comments', 'CommentsController')->only(['store', 'update', 'destroy']);
+Route::resource('comments', 'CommentsController')->only(['index','store', 'update', 'destroy']);
+
 
 
 Auth::routes();

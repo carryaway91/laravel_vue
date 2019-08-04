@@ -17,6 +17,7 @@ class PostsController extends Controller
     */
     public function index()
     {
+
         return view('posts.index', [
             'posts' => Post::with('user', 'comments')->get()
         ]);
@@ -44,8 +45,14 @@ class PostsController extends Controller
     public function show(Post $post)
     {
         $post->load('comments', 'comments.user');
+        return view('posts.show',compact('post'));
        
-        return view('posts.show', compact('post'));
+    }
+
+    public function fetch(Request $request) {
+        
+        $post = Post::with('comments', 'comments.user')->where('slug', $request->slug)->get();
+        return (object)$post;
     }
 
     public function edit(Post $post)

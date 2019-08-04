@@ -16,3 +16,5 @@
         </div>
     </section>
 @endsection
+
+{{-- index, vypis vsetkych postov --}}

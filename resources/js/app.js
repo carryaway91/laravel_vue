@@ -19,10 +19,11 @@ window.Vue = require('vue');
 // const files = require.context('./', true, /\.vue$/i);
 // files.keys().map(key => Vue.component(key.split('/').pop().split('.')[0], files(key).default));
 
-Vue.component('interaction-panel', require('./components/InteractionPanel.vue').default);
 Vue.component('like-counter', require('./components/LikeCounter.vue').default);
 Vue.component('flash-message', require('./components/FlashMessage.vue').default);
-Vue.component('comment', require('./components/Comment.vue').default);
+Vue.component('comment-list', require('./components/comments/CommentList.vue').default);
+Vue.component('comment-form', require('./components/comments/CommentForm.vue').default);
+
 
 
 

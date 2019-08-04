@@ -10,3 +10,5 @@
         <a href="{{ route('posts.show', $post->slug ).'#comment'}}">{{ $post->comments->count() }}
         <strong>{{ str_plural('comment', $post->comments->count()) }}</strong></a>
     </article>  
+
+    {{-- jeden post v indexe --}}

@@ -19,6 +19,8 @@ class CommentsController extends Controller
         $this->middleware('auth');
     }
 
+
+
     public function store(Request $request)
     {
         /* 
@@ -52,8 +54,9 @@ class CommentsController extends Controller
 
     public function update(Request $request, Comment $comment)
     {
-        $this->authorize('update', $comment);
+       // $this->authorize('update', $comment);
         $comment->text = $request->text;
+        $comment->save();
         session()->flash('flash', 'Comment Updated!');
         return $request;
 

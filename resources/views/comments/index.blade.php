@@ -26,11 +26,6 @@
         @endauth
 
         {{-- vytahujeme komenty vdaka vztahom, ktore su urcene v modely --}}
-        @foreach( $post->comments as $comment)
-            <li>
-               @include('comments.show')
-            </li>
-        @endforeach
     </ol>
     
 </section>
