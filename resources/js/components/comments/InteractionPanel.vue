@@ -1,42 +1,55 @@
 <template>
     <ul class="response-panel">
-        <li><a href="#" class="response-item" 
-        @click.prevent="likedComment()">{{ like }}</a>
+        <li 
+        @mouseenter="overBtn = true"
+        @mouseleave="overBtn = false"
+        class="response-panel-item emoji-panel-link">
+            <form>
+                <input type="hidden" :value="csrfToken" name="_token"/>
+
+                <a :class="emojiClass" href="#"  
+                @click.prevent="likedComment()">
+                <span class="emojiLike"><img :src="emoji" :class="emojiClass"></span> Like</a>
+            </form>
+            <emoji-panel v-if="overBtn" v-on:selectedEmoji="emoticon($event)"></emoji-panel>
         </li>
-        <li
-        v-if="parentData">
-            <button class="action-btn"
-            @click="showActionPanel = !showActionPanel"
-            >...</button>
-                <ul v-if="showActionPanel" class="action-panel">
-                    <li><a href="#" class="response-item"
-                    @click.prevent="editComment()"
-                    :text="responseText"
-                    >{{ responseText }}</a>
-                    </li>
-                    <li><a href="#" class="response-item">X</a></li>
-                </ul>
+
+        <li class="response-panel-item">
+            <a href="#" @click.prevent="$emit('showCommentsEvent')">Comment</a>
+        </li>
+        <li class="response-panel-item">
+            <action-menu :comment="id"></action-menu>
         </li>
     </ul>
 </template>
 
 <script>
+
+    import emojiPanel from './EmojiPanel'
+    import commentForm from './CommentForm'
+    import actionMenu from './ActionMenu'
+
+    import { setTimeout } from 'timers';
+
     export default {
         name: 'InteractionPanel',
         
-        props: ['totallikes', 'data', 'parent-data'],
+        components: { emojiPanel, commentForm, actionMenu },
+
+        props: ['likes', 'commentId'],
 
         data() {
             return {
                 liked: false,
                 userLike: 0,
                 like: 'Like',
-                likeCounter: 0,
-                text: this.data,
+                totalLikes: this.likes,
+                id: this.commentId,
                 permission: true,
-
-                responseText: "Edit",
-                showActionPanel: false,
+                csrfToken: '',
+                emoji: '',
+                emojiClass: '',
+                overBtn: false,
             }
         },
 
@@ -46,8 +59,11 @@
                     this.liked = true
                     this.userLike = 1
                     this.like = 'Unlike'
-                    this.likeCounter++
+                    this.totalLikes++
                     this.$root.$emit('counting',this.likeCounter)
+                    this.updatedLikes()
+                  
+
                 } else {
                     this.liked = false
                     this.userLike = 0
@@ -57,41 +73,109 @@
                 }
             },
 
-            //ked klikneme na edit/cancel button
-            editComment() {
-                if( this.responseText == "Edit") {
-                    this.$emit('editing', true);
-                    this.responseText = "Cancel"
-                } else if( this.responseText == "Cancel") {
-                    this.$emit('editing', false)
-                    this.responseText = 'Edit'
+            updatedLikes() {
+
+                let comment = {
+                    csrf: this.csrfToken,
+                    likes: this.totalLikes
                 }
+
+                axios.patch('/comments/' + this.id, comment)
+            },
+
+            leavingBtn() {
+                setTimeout(() => {
+                    this.overBtn = false
+                }, 300);
+            },
+
+            overPanelHover(data) {
+                this.overPanel = data
+            },
+
+            deleteComment() {
+            },
+
+            // emoticony
+
+            emojiPanelShow() {
+
+                    this.emojiPanelVisible = true
+            },
+
+            emojiPanelHide() {
+                    this.emojiPanelVisible = false   
+                 
+            },
+
+            emoticon(data) {
+                this.emoji = data.key
+                this.emojiClass = data.val
+                this.overBtn = false
             }
+
         },
 
         mounted() {
-            this.$root.$on('editDone', (v) => this.responseText = "Edit")
+            this.csrfToken = document.querySelector('meta[name="csrf-token"]').content
+        
         }
     }
 </script>
-<style lang="scss" scoped>
+<style lang="scss">
+
+
+    .emoji-panel-link {
+        position: relative
+    }
+
+    .emojiLike {
+        position: absolute;
+            left: 27%;
+            bottom: 18%;
+    }
 
     .response-panel {
         display: flex;
+        justify-content: space-around;
+        border-top: 1px solid gray;
+        border-bottom: 1px solid gray;
+        margin-bottom: 1rem;
 
-        li {
-            margin-right: 1.5rem
+        .response-panel-item {
+            width: 100%;
+
+            a {
+                width: 100%;
+                height: 100%;
+                display: inline-block;
+                padding: .5rem 0
+            }
+
+            a:hover {
+                background-color: pink;
+            }
         }
     }
+   
+    .emojiLike {
+        width: 20px
+    }
 
-    .action-btn {
-        position: relative;
-        display:inline-block
+    .like, .heart, .wow, .angry {
+        font-weight: bold;
+    }
 
-        .action-panel {
-            position: absolute;
-
-        }
-        
+    .like {
+        color: blue;
+    }
+    .heart {
+        color: red
+    }
+    .wow {
+        color: yellow
+    }
+    .angry {
+        color: orangered
     }
 </style>

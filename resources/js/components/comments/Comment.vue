@@ -1,73 +1,77 @@
 <template>
-    <article @mouseenter="showMenu = true" @mouseleave="showMenuMethod()">
-        <p v-if="!commenting">{{ comment.text }}</p>
-        
+    <article>
+        <p class="comment-text" v-if="!userEditing">{{ comment.text }}</p>
+       
         <form v-else @submit.prevent="storeUpdated">
             <input type="hidden" :value="csrfToken" name="_token"/>
-            <input type="text" v-model="commentText">
+            <input class="editCommentInput" type="text" v-model="comment.text">
             <input type="hidden" name="id" :value="comment.id">
         </form>
-        <div>
+
+        <div class="commenter-details">
             <strong>{{comment.user.name}}</strong>
             <time>{{ comment.updated_at }}</time>
-        <interactionPanel 
-        v-on:editing="editingComment"
-        :parent-data="showMenu"
-        ></interactionPanel>
         </div>
-       
+        <div class="likeCounterPanel">
+            <span>{{ comment.likes }}</span>
+        </div>
+       <interactionPanel 
+        v-on:showCommentsEvent="showComments"
+        :commentId="comment.id"
+        :likes="comment.likes"
+        ></interactionPanel>
+
+        <reply-form
+        v-show="showCommentSection"
+        :commentId="comment.Id"
+        :csrfToken="csrfToken"
+        ></reply-form>
     </article>
 </template>
 
 <script>
-
     import interactionPanel from "./InteractionPanel"
+    import replyForm from "./ReplyForm"
 
     export default {
         name: 'Comment',
 
         props: ['comment'],
 
-        components: { interactionPanel },
+        components: { interactionPanel, replyForm },
         
         data() {
             return {
-                commenting: false,
-                showMenu: false,
+                showMenu: true,
                 commentText: '',
+                userEditing: false,
+                commentSection: false,
                 csrfToken: '',
-                userEditing: false
+                
+                userEditing: false,
+                commentID: this.comment.id,
+
+                showCommentSection: false
             }
         },
 
         methods: {
-            showMenuMethod() {
-                if(!this.userEditing)
-                this.showMenu = false
-            },
-        //zobrazi bud text alebo input
-            editingComment(data) {
-                if( data ) {
-                    this.commenting = data
-                    this.userEditing = data
-                }
-                else {
-                    this.commenting = data
-                    this.userEditing = data
-}
-            },
-
-            storeUpdated() {
+             storeUpdated() {
                 let updatedComment = {
-                    text: this.commentText,
+                    text: this.comment.text,
                     csrf: this.csrfToken,
                 }
                 axios.patch('/comments/' + this.comment.id, updatedComment)
-                .then( res => console.log(res))
-                .catch( err => console.log(err))
-                this.commenting = false
+                
+                this.userEditing = false
                 this.$emit('commentUpdated')
-            }
+                this.$root.$emit('done', true) 
+            },
+         
+
+             showComments() {
+                this.showCommentSection = true
+            },
         },
 
         created() {
@@ -76,11 +80,48 @@
         },
 
         mounted() {
-        
+            this.$root.$on('editing', (data) => {
+                if( data.val && data.id == this.comment.id) {
+                    this.userEditing = true
+                } else {
+                    this.userEditing = false
+            }})
         }
     }
     </script>
 
-<style>
+<style lang="scss" scoped>
+    
+  
+    .comment-text, 
+    .commenter-details,
+    .likeCounter
+     {
+        text-align: left;
+    }
+    
+    .commenter-details {
+        position: relative;
+        padding: .5rem 0;
+    }
 
+    .editCommentInput {
+        width: 100%;
+        height: auto;
+        border: 1px solid pink;
+        padding: .5rem 1rem;
+        border-radius: 3rem;
+        background-color: #f5e9eb;
+        outline: none;
+    }
+
+      .editCommentInput {
+        width: 100%;
+        height: auto;
+        border: 1px solid pink;
+        padding: .5rem 1rem;
+        border-radius: 3rem;
+        background-color: #f5e9eb;
+        outline: none;
+    }
 </style>

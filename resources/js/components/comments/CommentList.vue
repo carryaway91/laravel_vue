@@ -31,7 +31,7 @@ export default {
             axios.get('/posts/' + this.slug + '/comments')
             .then( res => this.comments = res.data[0].comments,
             ))
-            this.$root.$emit('editDone', true)
+            this.$root.$emit('editDone')
         }
     },
     
@@ -44,7 +44,9 @@ export default {
         this.$root.$on('commentAdded', () => 
             axios.get('/posts/' + this.slug + '/comments')
             .then( res => this.comments = res.data[0].comments))
-        }
+        
+       
+        },
     } 
 </script>
 
@@ -53,7 +55,7 @@ export default {
         margin-top: 2rem;
 
         .commnent-item {
-            margin-top: 1rem
+            margin: 1rem 0 3rem 0
         }
     }
 </style>
