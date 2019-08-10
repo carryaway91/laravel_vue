@@ -17,11 +17,13 @@ class CreateCommentsTable extends Migration
             $table->bigIncrements('id');
             $table->integer('user_id')->unsigned();
             $table->integer('post_id')->unsigned();
+            $table->integer('comment_id')->unsigned()->nullable();
             $table->text('text');
             $table->integer('likes')->nullable();
             $table->timestamps();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('post_id')->references('id')->on('posts')->onDelete('cascade');
+            $table->foreign('comment_id')->references('id')->on('comments');
 
         });
     }

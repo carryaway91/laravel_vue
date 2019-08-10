@@ -6,7 +6,6 @@
         class="response-panel-item emoji-panel-link">
             <form>
                 <input type="hidden" :value="csrfToken" name="_token"/>
-
                 <a :class="emojiClass" href="#"  
                 @click.prevent="likedComment()">
                 <span class="emojiLike"><img :src="emoji" :class="emojiClass"></span> Like</a>
@@ -41,7 +40,6 @@
         data() {
             return {
                 liked: false,
-                userLike: 0,
                 like: 'Like',
                 totalLikes: this.likes,
                 id: this.commentId,
@@ -60,16 +58,15 @@
                     this.userLike = 1
                     this.like = 'Unlike'
                     this.totalLikes++
-                    this.$root.$emit('counting',this.likeCounter)
                     this.updatedLikes()
                   
 
                 } else {
                     this.liked = false
-                    this.userLike = 0
-                    this.likeCounter--
+                    this.totalLikes--
                     this.like = 'Like'
-                    this.$root.$emit('counting',this.likeCounter)
+                    this.updatedLikes()
+
                 }
             },
 
@@ -79,8 +76,7 @@
                     csrf: this.csrfToken,
                     likes: this.totalLikes
                 }
-
-                axios.patch('/comments/' + this.id, comment)
+                axios.patch('/comments/' + this.id, comment).then(res => console.log(res.data)).catch(err => console.log(err.response.data.message))
             },
 
             leavingBtn() {

@@ -12,33 +12,39 @@
             <strong>{{comment.user.name}}</strong>
             <time>{{ comment.updated_at }}</time>
         </div>
+       
         <div class="likeCounterPanel">
             <span>{{ comment.likes }}</span>
         </div>
+       
        <interactionPanel 
         v-on:showCommentsEvent="showComments"
         :commentId="comment.id"
         :likes="comment.likes"
         ></interactionPanel>
 
-        <reply-form
+
+        <!-- do comment sekcie posleme len komentare, ktore maju dane comment_id pre dany komentar-->
+        <comment-section
         v-show="showCommentSection"
-        :commentId="comment.Id"
+        :commentId="comment.id"
+        :author="comment.user.id"
+        :postId="comment.post_id"
         :csrfToken="csrfToken"
-        ></reply-form>
+        ></comment-section>
     </article>
 </template>
 
 <script>
     import interactionPanel from "./InteractionPanel"
-    import replyForm from "./ReplyForm"
+    import commentSection from "./CommentSection"
 
     export default {
         name: 'Comment',
 
         props: ['comment'],
 
-        components: { interactionPanel, replyForm },
+        components: { interactionPanel, commentSection },
         
         data() {
             return {
@@ -51,7 +57,9 @@
                 userEditing: false,
                 commentID: this.comment.id,
 
-                showCommentSection: false
+                showCommentSection: false,
+
+                replies: []
             }
         },
 
@@ -86,6 +94,7 @@
                 } else {
                     this.userEditing = false
             }})
+            this.replies.push(this.comment.comment_id)
         }
     }
     </script>

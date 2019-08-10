@@ -16,7 +16,7 @@ class Comment extends Model
     a doplnit novy udaj a poslat hodnoty ktore nie su ziaduce alebo nebezpecne
     */
     protected $fillable = [
-        'text', 'post_id', 'likes'
+        'text', 'post_id', 'likes', 'comment_id'
     ];
 
     // Vztahy medzi db
@@ -26,6 +26,10 @@ class Comment extends Model
 
     public function post() {
         return $this->belongsTo('App\Post');
+    }
+
+    public function comments() {
+        $this->belongsTo('App\Comment');
     }
 
     //Autorizacia

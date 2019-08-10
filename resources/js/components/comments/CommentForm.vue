@@ -30,12 +30,14 @@ export default {
             let newUser = {
                 csrf: this.csrfToken,
                 text: this.text,
-                post_id: this.postData.id
+                post_id: this.postData.id,
+                comment_id: null
             }
-            axios.post('/comments', newUser)
+            if( this.text.length > 0 ) {
+            axios.post('/comments', newUser).then(res => console.log(res.data)).catch(err => console.log(err.response.data.message))
             this.text = ''
             this.$root.$emit('commentAdded')
-     
+            }
         }
     },
     created() {

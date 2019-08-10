@@ -21,6 +21,8 @@ export default {
     data() {
         return {
             comments: [],
+            main: [],
+            replies: []
         }
     },
 
@@ -30,9 +32,11 @@ export default {
             console.log('Bez console logu to nefunguje wuT?!'),
             axios.get('/posts/' + this.slug + '/comments')
             .then( res => this.comments = res.data[0].comments,
+            console.log(res)
             ))
             this.$root.$emit('editDone')
-        }
+        },
+
     },
     
     created() {
@@ -44,8 +48,10 @@ export default {
         this.$root.$on('commentAdded', () => 
             axios.get('/posts/' + this.slug + '/comments')
             .then( res => this.comments = res.data[0].comments))
-        
-       
+        this.$root.$on('commentDeleted', () => 
+            axios.get('/posts/' + this.slug + '/comments')
+            .then( res => this.comments = res.data[0].comments)
+            )
         },
     } 
 </script>

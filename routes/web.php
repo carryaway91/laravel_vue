@@ -17,6 +17,8 @@ Route::get('posts/{slug}/comments', 'PostsController@fetch');
 Route::resource('posts', 'PostsController');
 Route::resource('comments', 'CommentsController')->only(['index','store', 'update', 'destroy']);
 
+Route::get('main', 'CommentsController@getMainComments')->name('mainComments');
+Route::get('replies', 'CommentsController@getReplies')->name('replies');
 
 
 Auth::routes();

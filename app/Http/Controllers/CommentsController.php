@@ -18,8 +18,14 @@ class CommentsController extends Controller
     public function __construct() {
         $this->middleware('auth');
     }
+    
+    public function getMainComments(Request $request) {
+        return Comment::where('comment_id', null)->get();
+    }
 
-
+    public function getReplies(Request $request) {
+        return Comment::whereNotNull('comment_id')->get();
+    }
 
     public function store(Request $request)
     {
@@ -31,7 +37,8 @@ class CommentsController extends Controller
 
         $request->validate([
             'text' => 'required|max:1000',
-            'post_id' => 'required|integer|exists:posts,id'
+            'post_id' => 'required|integer|exists:posts,id',
+            
         ]);
         
         /* 
@@ -42,7 +49,9 @@ class CommentsController extends Controller
         $comment = auth()->user()->comments()->create( 
             ['text' => $request->text,
             'post_id' => $request->post_id,
-            'likes' => 0]
+            'likes' => 0,
+            'comment_id' => $request->comment_id
+            ]
         );
         return redirect('/posts/'. $comment->post->slug . '#comments')
                 ->with('flash', 'Comment added!');

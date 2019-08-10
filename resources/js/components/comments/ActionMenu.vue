@@ -12,7 +12,7 @@
             <li>
                 <form>
                     <input type="hidden" :value="csrfToken" name="_token"/>
-                    <a @click.prevent="deleteComment()" href="#" class="response-item">X</a>
+                    <a @click.prevent="deleteComment()" href="#" class="response-item">Delete</a>
                 </form>
             </li>
         </ul>
@@ -52,7 +52,8 @@ export default {
             }
 
             axios.delete('/comments/' + this.commentID, comment)
-            .then(res => console.log(res))
+            this.$root.$emit('commentDeleted')
+            this.showActionPanel = false
         }
     },
     
